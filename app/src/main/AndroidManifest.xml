@@ -33,6 +33,10 @@
         <activity
             android:name=".TripDetailActivity"
             android:theme="@style/Theme.TravelMan"/>
+
+        <activity
+            android:name=".AddTripActivity"
+            android:theme="@style/Theme.TravelMan" />
     </application>
 
 </manifest>

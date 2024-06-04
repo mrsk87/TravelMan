@@ -1,48 +1,77 @@
 package com.example.travelman
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.ImageButton
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
 class TripDetailActivity : AppCompatActivity() {
 
-    private lateinit var lvLocations: ListView
-    private lateinit var btnAddLocation: ImageButton
-    private lateinit var tvTripName: TextView
-    private val locations = arrayListOf("Local 1", "Local 2", "Local 3")
+    private lateinit var lvTrips: ListView
+    private lateinit var btnAddTrip: ImageButton
+    private lateinit var tvGreeting: TextView
+    private val trips = arrayListOf("Viagem 1", "Viagem 2", "Viagem 3")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trip_detail)
 
-        tvTripName = findViewById(R.id.tvTripName)
-        lvLocations = findViewById(R.id.lvLocations)
-        btnAddLocation = findViewById(R.id.btnAddLocation)
+        tvGreeting = findViewById(R.id.tvGreeting)
+        lvTrips = findViewById(R.id.lvTrips)
+        btnAddTrip = findViewById(R.id.btnAddTrip)
 
-        val tripName = intent.getStringExtra("tripName")
-        tvTripName.text = tripName
+        tvGreeting.text = "Ola User"
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, locations)
-        lvLocations.adapter = adapter
+        val adapter = TripAdapter()
+        lvTrips.adapter = adapter
 
-        lvLocations.setOnItemClickListener { _, _, position, _ ->
-            // Navegar para a tela de detalhes do local
-            val intent = Intent(this, LocationDetailActivity::class.java)
-            intent.putExtra("locationName", locations[position])
-            startActivity(intent)
+        btnAddTrip.setOnClickListener {
+            val intent = Intent(this, AddTripActivity::class.java)
+            startActivityForResult(intent, ADD_TRIP_REQUEST_CODE)
         }
+    }
 
-        btnAddLocation.setOnClickListener {
-            // Lógica para adicionar um novo local
-            val newLocationName = "Local ${locations.size + 1}"
-            locations.add(newLocationName)
-            adapter.notifyDataSetChanged()
-            Toast.makeText(this, "Novo local adicionado", Toast.LENGTH_SHORT).show()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == ADD_TRIP_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val tripName = data?.getStringExtra("TRIP_NAME")
+            if (!tripName.isNullOrEmpty()) {
+                trips.add(tripName)
+                (lvTrips.adapter as TripAdapter).notifyDataSetChanged()
+            }
         }
+    }
+
+    inner class TripAdapter : ArrayAdapter<String>(this, R.layout.list_item_trip, trips) {
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = convertView ?: layoutInflater.inflate(R.layout.list_item_trip, parent, false)
+
+            val tvTripName = view.findViewById<TextView>(R.id.tvTripName)
+            val btnEdit = view.findViewById<ImageButton>(R.id.btnEdit)
+            val btnDelete = view.findViewById<ImageButton>(R.id.btnDelete)
+
+            tvTripName.text = getItem(position)
+
+            btnEdit.setOnClickListener {
+                Toast.makeText(this@TripDetailActivity, "Editar ${getItem(position)}", Toast.LENGTH_SHORT).show()
+                // Lógica para editar a viagem
+            }
+
+            btnDelete.setOnClickListener {
+                trips.removeAt(position)
+                notifyDataSetChanged()
+                Toast.makeText(this@TripDetailActivity, "Apagar ${getItem(position)}", Toast.LENGTH_SHORT).show()
+                // Lógica para apagar a viagem
+            }
+
+            return view
+        }
+    }
+
+    companion object {
+        const val ADD_TRIP_REQUEST_CODE = 1
     }
 }

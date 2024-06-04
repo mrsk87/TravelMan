@@ -40,8 +40,8 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Login bem-sucedido, navegar para a tela principal ou outra tela
-                    val intent = Intent(this, MainActivity::class.java)
+                    // Login bem-sucedido, navegar para a tela de detalhes da viagem
+                    val intent = Intent(this, TripDetailActivity::class.java)
                     startActivity(intent)
                     finish()
                 } else {

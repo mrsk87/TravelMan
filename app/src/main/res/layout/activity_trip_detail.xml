@@ -6,25 +6,26 @@
     tools:context=".TripDetailActivity">
 
     <TextView
-        android:id="@+id/tvTripName"
+        android:id="@+id/tvGreeting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Ola User"
         android:textSize="24sp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:fontFamily="cursive" />
 
     <ListView
-        android:id="@+id/lvLocations"
+        android:id="@+id/lvTrips"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvTripName"
+        android:layout_below="@id/tvGreeting"
         android:layout_marginTop="20dp"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp" />
 
     <ImageButton
-        android:id="@+id/btnAddLocation"
+        android:id="@+id/btnAddTrip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_input_add"
@@ -32,5 +33,5 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
         android:backgroundTint="@android:color/holo_blue_light"
-        android:contentDescription="Add Location" />
+        android:contentDescription="Add Trip" />
 </RelativeLayout>
