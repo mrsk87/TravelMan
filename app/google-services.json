@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "677208226593",
+    "project_id": "travelman-412a6",
+    "storage_bucket": "travelman-412a6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:677208226593:android:2cda8429ebb6c26cb9dc60",
+        "android_client_info": {
+          "package_name": "com.example.travelman"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZT-54OwULM_Cf2PP-agQjAiBlS2ZnBzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
