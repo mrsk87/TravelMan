@@ -32,20 +32,38 @@ class TripDetailActivity : AppCompatActivity() {
             val intent = Intent(this, AddTripActivity::class.java)
             startActivityForResult(intent, ADD_TRIP_REQUEST_CODE)
         }
+
+        lvTrips.setOnItemClickListener { _, _, position, _ ->
+            val intent = Intent(this, TripLocationsActivity::class.java)
+            intent.putExtra("TRIP_NAME", trips[position])
+            startActivity(intent)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == ADD_TRIP_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val tripName = data?.getStringExtra("TRIP_NAME")
-            if (!tripName.isNullOrEmpty()) {
-                trips.add(tripName)
-                (lvTrips.adapter as TripAdapter).notifyDataSetChanged()
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                ADD_TRIP_REQUEST_CODE -> {
+                    val tripName = data?.getStringExtra("TRIP_NAME")
+                    if (!tripName.isNullOrEmpty()) {
+                        trips.add(tripName)
+                        (lvTrips.adapter as TripAdapter).notifyDataSetChanged()
+                    }
+                }
+                EDIT_TRIP_REQUEST_CODE -> {
+                    val newTripName = data?.getStringExtra("NEW_TRIP_NAME")
+                    val position = data?.getIntExtra("POSITION", -1) ?: -1
+                    if (!newTripName.isNullOrEmpty() && position in trips.indices) {
+                        trips[position] = newTripName
+                        (lvTrips.adapter as TripAdapter).notifyDataSetChanged()
+                    }
+                }
             }
         }
     }
 
-    inner class TripAdapter : ArrayAdapter<String>(this, R.layout.list_item_trip, trips) {
+    inner class TripAdapter : ArrayAdapter<String>(this@TripDetailActivity, R.layout.list_item_trip, trips) {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = convertView ?: layoutInflater.inflate(R.layout.list_item_trip, parent, false)
 
@@ -56,15 +74,16 @@ class TripDetailActivity : AppCompatActivity() {
             tvTripName.text = getItem(position)
 
             btnEdit.setOnClickListener {
-                Toast.makeText(this@TripDetailActivity, "Editar ${getItem(position)}", Toast.LENGTH_SHORT).show()
-                // Lógica para editar a viagem
+                val intent = Intent(this@TripDetailActivity, EditTripActivity::class.java)
+                intent.putExtra("TRIP_NAME", getItem(position))
+                intent.putExtra("POSITION", position)
+                startActivityForResult(intent, EDIT_TRIP_REQUEST_CODE)
             }
 
             btnDelete.setOnClickListener {
                 trips.removeAt(position)
                 notifyDataSetChanged()
                 Toast.makeText(this@TripDetailActivity, "Apagar ${getItem(position)}", Toast.LENGTH_SHORT).show()
-                // Lógica para apagar a viagem
             }
 
             return view
@@ -73,5 +92,6 @@ class TripDetailActivity : AppCompatActivity() {
 
     companion object {
         const val ADD_TRIP_REQUEST_CODE = 1
+        const val EDIT_TRIP_REQUEST_CODE = 2
     }
 }
