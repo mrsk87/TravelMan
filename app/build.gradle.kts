@@ -1,9 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    id("com.google.gms.google-services") // Apenas mantenha este
-    id("com.android.application")
-    id("kotlin-android")
+    id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
 
 android {
@@ -62,6 +61,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,11 +75,23 @@ dependencies {
     implementation("androidx.core:core-ktx:1.6.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.0")
 
-    // Dependências do Firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-    implementation("com.google.firebase:firebase-analytics-ktx")
+    // Firebase BoM - alinhar todas as dependências do Firebase
+    implementation(platform("com.google.firebase:firebase-bom:31.0.2"))
+
+    // Dependências do Firebase sem versão específica
+    implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-database-ktx")
-    //firestore
-    implementation("com.google.firebase:firebase-firestore-ktx:24.0.0")
+
+    // Room
+    implementation("androidx.room:room-runtime:2.3.0")
+    implementation("androidx.room:room-ktx:2.3.0")
+    kapt("androidx.room:room-compiler:2.3.0")
+
+    // Gson
+    implementation("com.google.code.gson:gson:2.8.8")
+
+    // Testing
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 }
