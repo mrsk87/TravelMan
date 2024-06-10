@@ -1,6 +1,9 @@
 package com.example.travelman
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -18,6 +21,9 @@ class TripLocationsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trip_locations)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = "Locais da Viagem"
+
         tvTripName = findViewById(R.id.tvTripName)
         lvLocations = findViewById(R.id.lvLocations)
         btnAddLocation = findViewById(R.id.btnAddLocation)
@@ -29,16 +35,45 @@ class TripLocationsActivity : AppCompatActivity() {
         lvLocations.adapter = adapter
 
         lvLocations.setOnItemClickListener { _, _, position, _ ->
-            Toast.makeText(this, "Clicked: ${locations[position]}", Toast.LENGTH_SHORT).show()
             // Lógica para abrir detalhes do local, se necessário
         }
 
         btnAddLocation.setOnClickListener {
-            // Lógica para adicionar um novo local
-            val newLocationName = "Local ${locations.size + 1}"
-            locations.add(newLocationName)
-            adapter.notifyDataSetChanged()
-            Toast.makeText(this, "Novo local adicionado", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, AddLocationActivity::class.java)
+            startActivityForResult(intent, ADD_LOCATION_REQUEST_CODE)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                ADD_LOCATION_REQUEST_CODE -> {
+                    val locationName = data?.getStringExtra("NAME")
+                    if (!locationName.isNullOrEmpty()) {
+                        locations.add(locationName)
+                        (lvLocations.adapter as LocationAdapter).notifyDataSetChanged()
+                    }
+                }
+                EDIT_LOCATION_REQUEST_CODE -> {
+                    val locationName = data?.getStringExtra("NAME")
+                    val position = data?.getIntExtra("POSITION", -1)
+                    if (!locationName.isNullOrEmpty() && position != null && position >= 0) {
+                        locations[position] = locationName
+                        (lvLocations.adapter as LocationAdapter).notifyDataSetChanged()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -49,12 +84,21 @@ class TripLocationsActivity : AppCompatActivity() {
             val tvLocationName = view.findViewById<TextView>(R.id.tvLocationName)
             val btnEdit = view.findViewById<ImageButton>(R.id.btnEdit)
             val btnDelete = view.findViewById<ImageButton>(R.id.btnDelete)
+            val btnView = view.findViewById<ImageButton>(R.id.btnView)
 
             tvLocationName.text = getItem(position)
 
             btnEdit.setOnClickListener {
-                Toast.makeText(this@TripLocationsActivity, "Editar ${getItem(position)}", Toast.LENGTH_SHORT).show()
-                // Lógica para editar o local
+                val intent = Intent(this@TripLocationsActivity, EditLocationActivity::class.java)
+                intent.putExtra("TYPE", "Tipo") // Substituir por dados reais
+                intent.putExtra("NAME", getItem(position))
+                intent.putExtra("LOCATION", "Localização") // Substituir por dados reais
+                intent.putExtra("DESCRIPTION", "Descrição") // Substituir por dados reais
+                intent.putExtra("DATE", "Data") // Substituir por dados reais
+                intent.putExtra("RATING", "Classificação") // Substituir por dados reais
+                intent.putStringArrayListExtra("PHOTOS", arrayListOf("Foto 1", "Foto 2")) // Substituir por dados reais
+                intent.putExtra("POSITION", position)
+                startActivityForResult(intent, EDIT_LOCATION_REQUEST_CODE)
             }
 
             btnDelete.setOnClickListener {
@@ -65,7 +109,24 @@ class TripLocationsActivity : AppCompatActivity() {
                 }
             }
 
+            btnView.setOnClickListener {
+                val intent = Intent(this@TripLocationsActivity, ViewLocationActivity::class.java)
+                intent.putExtra("TYPE", "Tipo") // Substituir por dados reais
+                intent.putExtra("NAME", getItem(position))
+                intent.putExtra("LOCATION", "Localização") // Substituir por dados reais
+                intent.putExtra("DESCRIPTION", "Descrição") // Substituir por dados reais
+                intent.putExtra("DATE", "Data") // Substituir por dados reais
+                intent.putExtra("RATING", "Classificação") // Substituir por dados reais
+                intent.putStringArrayListExtra("PHOTOS", arrayListOf("Foto 1", "Foto 2")) // Substituir por dados reais
+                startActivity(intent)
+            }
+
             return view
         }
+    }
+
+    companion object {
+        const val ADD_LOCATION_REQUEST_CODE = 1
+        const val EDIT_LOCATION_REQUEST_CODE = 2
     }
 }

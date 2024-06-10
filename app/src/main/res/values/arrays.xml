@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="location_types">
+        <item>Tipo 1</item>
+        <item>Tipo 2</item>
+        <item>Tipo 3</item>
+    </string-array>
+
+    <string-array name="location_ratings">
+        <item>1 Estrela</item>
+        <item>2 Estrelas</item>
+        <item>3 Estrelas</item>
+        <item>4 Estrelas</item>
+        <item>5 Estrelas</item>
+    </string-array>
+</resources>

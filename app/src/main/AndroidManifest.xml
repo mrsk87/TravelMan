@@ -45,6 +45,16 @@
         <activity
             android:name=".EditTripActivity"
             android:theme="@style/Theme.TravelMan" />
+        <activity
+            android:name=".AddLocationActivity"
+            android:theme="@style/Theme.TravelMan" />
+        <activity
+            android:name=".ViewLocationActivity"
+            android:theme="@style/Theme.TravelMan" />
+        <activity
+            android:name=".EditLocationActivity"
+            android:theme="@style/Theme.TravelMan" />
+
 
 
     </application>

@@ -3,6 +3,7 @@ package com.example.travelman
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -18,6 +19,9 @@ class TripDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trip_detail)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = "Viagens"
 
         tvGreeting = findViewById(R.id.tvGreeting)
         lvTrips = findViewById(R.id.lvTrips)
@@ -63,6 +67,16 @@ class TripDetailActivity : AppCompatActivity() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     inner class TripAdapter : ArrayAdapter<String>(this@TripDetailActivity, R.layout.list_item_trip, trips) {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = convertView ?: layoutInflater.inflate(R.layout.list_item_trip, parent, false)
@@ -70,6 +84,7 @@ class TripDetailActivity : AppCompatActivity() {
             val tvTripName = view.findViewById<TextView>(R.id.tvTripName)
             val btnEdit = view.findViewById<ImageButton>(R.id.btnEdit)
             val btnDelete = view.findViewById<ImageButton>(R.id.btnDelete)
+            val btnAddLocation = view.findViewById<ImageButton>(R.id.btnAddLocation)
 
             tvTripName.text = getItem(position)
 
@@ -81,9 +96,17 @@ class TripDetailActivity : AppCompatActivity() {
             }
 
             btnDelete.setOnClickListener {
-                trips.removeAt(position)
-                notifyDataSetChanged()
-                Toast.makeText(this@TripDetailActivity, "Apagar ${getItem(position)}", Toast.LENGTH_SHORT).show()
+                if (position in trips.indices) {
+                    trips.removeAt(position)
+                    notifyDataSetChanged()
+                    Toast.makeText(this@TripDetailActivity, "Apagar ${getItem(position)}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            btnAddLocation.setOnClickListener {
+                val intent = Intent(this@TripDetailActivity, TripLocationsActivity::class.java)
+                intent.putExtra("TRIP_NAME", getItem(position))
+                startActivity(intent)
             }
 
             return view
