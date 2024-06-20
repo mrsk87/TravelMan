@@ -1,19 +1,26 @@
 package com.example.travelman
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 
 class ViewLocationActivity : AppCompatActivity() {
 
-    private lateinit var spinnerType: Spinner
-    private lateinit var etName: EditText
-    private lateinit var etLocation: EditText
-    private lateinit var etDescription: EditText
-    private lateinit var etDate: EditText
-    private lateinit var spinnerRating: Spinner
+    private lateinit var tvType: TextView
+    private lateinit var tvName: TextView
+    private lateinit var tvDescription: TextView
+    private lateinit var tvDate: TextView
+    private lateinit var tvRating: TextView
+    private lateinit var tvCoordinates: TextView
+    private lateinit var btnOpenInMaps: Button
     private lateinit var photosContainer: LinearLayout
+
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,12 +29,13 @@ class ViewLocationActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Ver Local"
 
-        spinnerType = findViewById(R.id.spinnerType)
-        etName = findViewById(R.id.etName)
-        etLocation = findViewById(R.id.etLocation)
-        etDescription = findViewById(R.id.etDescription)
-        etDate = findViewById(R.id.etDate)
-        spinnerRating = findViewById(R.id.spinnerRating)
+        tvType = findViewById(R.id.tvType)
+        tvName = findViewById(R.id.tvName)
+        tvDescription = findViewById(R.id.tvDescription)
+        tvDate = findViewById(R.id.tvDate)
+        tvRating = findViewById(R.id.tvRating)
+        tvCoordinates = findViewById(R.id.tvCoordinates)
+        btnOpenInMaps = findViewById(R.id.btnOpenInMaps)
         photosContainer = findViewById(R.id.photosContainer)
 
         // Receber dados passados da atividade anterior
@@ -38,19 +46,34 @@ class ViewLocationActivity : AppCompatActivity() {
         val date = intent.getStringExtra("DATE") ?: "Data"
         val rating = intent.getStringExtra("RATING") ?: "Classificação"
         val photos = intent.getStringArrayListExtra("PHOTOS") ?: arrayListOf()
+        latitude = intent.getDoubleExtra("LATITUDE", 0.0)
+        longitude = intent.getDoubleExtra("LONGITUDE", 0.0)
 
         // Preencher os campos com os dados recebidos
-        spinnerType.setSelection((spinnerType.adapter as ArrayAdapter<String>).getPosition(type))
-        etName.setText(name)
-        etLocation.setText(location)
-        etDescription.setText(description)
-        etDate.setText(date)
-        spinnerRating.setSelection((spinnerRating.adapter as ArrayAdapter<String>).getPosition(rating))
+        tvType.text = type
+        tvName.text = name
+        tvDescription.text = description
+        tvDate.text = date
+        tvRating.text = rating
+        tvCoordinates.text = "$latitude, $longitude"
+
+        btnOpenInMaps.setOnClickListener {
+            val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude($name)")
+            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+            mapIntent.setPackage("com.google.android.apps.maps")
+            startActivity(mapIntent)
+        }
 
         // Adicionar fotos ao container
         photos.forEach { photo ->
             val imageView = ImageView(this)
-            imageView.setImageResource(android.R.drawable.ic_menu_gallery) // Substituir com a lógica real para carregar a imagem
+            Glide.with(this).load(photo).into(imageView)
+            imageView.layoutParams = LinearLayout.LayoutParams(
+                200,
+                200
+            ).apply {
+                setMargins(8, 8, 8, 8)
+            }
             photosContainer.addView(imageView)
         }
     }

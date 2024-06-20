@@ -19,7 +19,7 @@ class TripLocationsActivity : AppCompatActivity() {
     private lateinit var btnOpenInMaps: Button
     private lateinit var lvLocations: ListView
     private lateinit var btnAddLocation: ImageButton
-    private val locations = arrayListOf("Local 1", "Local 2", "Local 3")
+    private val locations = arrayListOf<String>()
     private lateinit var tripName: String
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
@@ -47,9 +47,9 @@ class TripLocationsActivity : AppCompatActivity() {
         longitude = intent.getDoubleExtra("LONGITUDE", 0.0)
 
         tvTripName.text = tripName
-        tvCountry.text = country
-        tvCity.text = city
-        tvVisitDate.text = visitDate
+        tvCountry.text = "País: $country"
+        tvCity.text = "Cidade: $city"
+        tvVisitDate.text = "Data: $visitDate"
 
         btnOpenInMaps.setOnClickListener {
             val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude($tripName)")

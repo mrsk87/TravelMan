@@ -5,79 +5,136 @@
     android:layout_height="match_parent"
     tools:context=".ViewLocationActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ver Local"
             android:textSize="24sp"
-            android:layout_gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
             android:fontFamily="cursive" />
 
-        <Spinner
-            android:id="@+id/spinnerType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:entries="@array/location_types"
-            android:enabled="false" />
-
-        <EditText
-            android:id="@+id/etName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="Nome"
-            android:enabled="false" />
-
-        <EditText
-            android:id="@+id/etLocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="Localização"
-            android:enabled="false" />
-
-        <EditText
-            android:id="@+id/etDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="Descrição"
-            android:enabled="false" />
-
-        <EditText
-            android:id="@+id/etDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="Data"
-            android:enabled="false" />
-
-        <Spinner
-            android:id="@+id/spinnerRating"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:entries="@array/location_ratings"
-            android:enabled="false" />
-
         <TextView
+            android:id="@+id/tvTypeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Foto"
-            android:layout_marginTop="10dp" />
+            android:text="Tipo:"
+            android:layout_below="@id/tvTitle"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvTypeLabel"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvNameLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nome:"
+            android:layout_below="@id/tvType"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvNameLabel"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvDescriptionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Descrição:"
+            android:layout_below="@id/tvName"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvDescriptionLabel"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvDateLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Data:"
+            android:layout_below="@id/tvDescription"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvDateLabel"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvRatingLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Classificação:"
+            android:layout_below="@id/tvDate"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvRatingLabel"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvCoordinatesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Coordenadas:"
+            android:layout_below="@id/tvRating"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvCoordinates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvCoordinatesLabel"
+            android:layout_margin="16dp" />
+
+        <Button
+            android:id="@+id/btnOpenInMaps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Abrir no Google Maps"
+            android:layout_below="@id/tvCoordinates"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="16dp" />
+
+        <TextView
+            android:id="@+id/tvAddPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fotos:"
+            android:layout_below="@id/btnOpenInMaps"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:fontFamily="cursive" />
 
         <LinearLayout
             android:id="@+id/photosContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="10dp" />
-    </LinearLayout>
+            android:layout_below="@id/tvAddPhoto"
+            android:layout_margin="16dp"
+            android:orientation="horizontal" />
+
+    </RelativeLayout>
 </ScrollView>

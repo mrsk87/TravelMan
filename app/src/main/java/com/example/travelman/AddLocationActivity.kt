@@ -6,6 +6,8 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -21,7 +23,6 @@ import java.util.*
 
 class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var spinnerType: Spinner
     private lateinit var etName: EditText
     private lateinit var etDescription: EditText
     private lateinit var etDate: EditText
@@ -29,6 +30,7 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var btnAddPhoto: ImageButton
     private lateinit var btnPickLocation: Button
     private lateinit var btnSave: Button
+    private lateinit var etLocation: EditText
     private lateinit var googleMap: GoogleMap
     private var selectedLatLng: LatLng? = null
     private val photos = mutableListOf<String>() // Simulando com strings de caminho de imagem
@@ -40,7 +42,6 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Add Local"
 
-        spinnerType = findViewById(R.id.spinnerType)
         etName = findViewById(R.id.etName)
         etDescription = findViewById(R.id.etDescription)
         etDate = findViewById(R.id.etDate)
@@ -48,33 +49,54 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         btnAddPhoto = findViewById(R.id.btnAddPhoto)
         btnPickLocation = findViewById(R.id.btnPickLocation)
         btnSave = findViewById(R.id.btnSave)
+        etLocation = findViewById(R.id.etLocation)
+
+        // Setup spinner for rating
+        val ratingAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.location_ratings,
+            android.R.layout.simple_spinner_item
+        )
+        ratingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerRating.adapter = ratingAdapter
 
         etDate.setOnClickListener {
             showDatePickerDialog()
         }
 
         btnPickLocation.setOnClickListener {
-            showMapFragment()
+            val intent = Intent(this, PickLocationActivity::class.java)
+            startActivityForResult(intent, PICK_LOCATION_REQUEST_CODE)
         }
 
         btnAddPhoto.setOnClickListener {
-            // Simulando adição de foto
-            photos.add("Foto ${photos.size + 1}")
-            Toast.makeText(this, "Foto adicionada", Toast.LENGTH_SHORT).show()
+            checkStoragePermissionAndPickPhoto()
         }
 
         btnSave.setOnClickListener {
-            val intent = Intent()
-            intent.putExtra("TYPE", spinnerType.selectedItem.toString())
-            intent.putExtra("NAME", etName.text.toString())
-            intent.putExtra("DESCRIPTION", etDescription.text.toString())
-            intent.putExtra("DATE", etDate.text.toString())
-            intent.putExtra("RATING", spinnerRating.selectedItem.toString())
-            intent.putExtra("LATITUDE", selectedLatLng?.latitude)
-            intent.putExtra("LONGITUDE", selectedLatLng?.longitude)
-            intent.putStringArrayListExtra("PHOTOS", ArrayList(photos))
-            setResult(Activity.RESULT_OK, intent)
-            finish()
+            val type = "Tipo" // Just a placeholder
+            val name = etName.text.toString()
+            val description = etDescription.text.toString()
+            val date = etDate.text.toString()
+            val rating = spinnerRating.selectedItem?.toString()
+
+            Log.d("AddLocationActivity", "Type: $type, Name: $name, Description: $description, Date: $date, Rating: $rating, Latitude: ${selectedLatLng?.latitude}, Longitude: ${selectedLatLng?.longitude}")
+
+            if (!type.isNullOrEmpty() && name.isNotEmpty() && description.isNotEmpty() && date.isNotEmpty() && !rating.isNullOrEmpty() && selectedLatLng != null) {
+                val intent = Intent()
+                intent.putExtra("TYPE", type)
+                intent.putExtra("NAME", name)
+                intent.putExtra("DESCRIPTION", description)
+                intent.putExtra("DATE", date)
+                intent.putExtra("RATING", rating)
+                intent.putExtra("LATITUDE", selectedLatLng?.latitude)
+                intent.putExtra("LONGITUDE", selectedLatLng?.longitude)
+                intent.putStringArrayListExtra("PHOTOS", ArrayList(photos))
+                setResult(Activity.RESULT_OK, intent)
+                finish()
+            } else {
+                Toast.makeText(this, "Por favor, preencha todos os campos e escolha uma localização", Toast.LENGTH_SHORT).show()
+            }
         }
 
         checkLocationPermission()
@@ -94,16 +116,6 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         datePickerDialog.show()
     }
 
-    private fun showMapFragment() {
-        val mapFragment = SupportMapFragment.newInstance()
-        mapFragment.getMapAsync(this)
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.mapContainer, mapFragment)
-            .addToBackStack(null)
-            .commit()
-    }
-
     private fun checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
@@ -121,6 +133,23 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment?.getMapAsync(this)
     }
 
+    private fun checkStoragePermissionAndPickPhoto() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_PERMISSION_REQUEST_CODE)
+        } else {
+            // Permission has already been granted
+            pickPhotoFromGallery()
+        }
+    }
+
+    private fun pickPhotoFromGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        intent.type = "image/*"
+        startActivityForResult(intent, PICK_PHOTO_REQUEST_CODE)
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -136,7 +165,36 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
                     // Permission denied, boo!
                     Toast.makeText(this, "Permission denied to access location", Toast.LENGTH_SHORT).show()
                 }
-                return
+            }
+            STORAGE_PERMISSION_REQUEST_CODE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    // Permission was granted, yay!
+                    pickPhotoFromGallery()
+                } else {
+                    // Permission denied, boo!
+                    Toast.makeText(this, "Permission denied to access storage", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                PICK_PHOTO_REQUEST_CODE -> {
+                    data?.data?.let { uri ->
+                        // Adicione o URI da foto à lista de fotos
+                        photos.add(uri.toString())
+                        Toast.makeText(this, "Foto adicionada", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                PICK_LOCATION_REQUEST_CODE -> {
+                    val latitude = data?.getDoubleExtra("LATITUDE", 0.0) ?: 0.0
+                    val longitude = data?.getDoubleExtra("LONGITUDE", 0.0) ?: 0.0
+                    selectedLatLng = LatLng(latitude, longitude)
+                    etLocation.setText("Lat: $latitude, Lng: $longitude")
+                }
             }
         }
     }
@@ -167,5 +225,8 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+        private const val STORAGE_PERMISSION_REQUEST_CODE = 2
+        private const val PICK_PHOTO_REQUEST_CODE = 3
+        private const val PICK_LOCATION_REQUEST_CODE = 4
     }
 }

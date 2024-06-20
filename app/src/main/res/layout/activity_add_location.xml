@@ -1,90 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AddLocationActivity">
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add Local"
-        android:textSize="24sp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:fontFamily="cursive" />
-
-    <Spinner
-        android:id="@+id/spinnerType"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:prompt="@string/type_prompt" />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/etName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/spinnerType"
-        android:layout_margin="16dp"
-        android:hint="@string/name_hint" />
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Local"
+            android:textSize="24sp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:fontFamily="cursive" />
 
-    <EditText
-        android:id="@+id/etDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/etName"
-        android:layout_margin="16dp"
-        android:hint="@string/description_hint" />
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvTitle"
+            android:layout_margin="16dp"
+            android:hint="@string/name_hint" />
 
-    <EditText
-        android:id="@+id/etDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/etDescription"
-        android:layout_margin="16dp"
-        android:hint="@string/date_hint" />
+        <EditText
+            android:id="@+id/etDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/etName"
+            android:layout_margin="16dp"
+            android:hint="@string/description_hint" />
 
-    <Button
-        android:id="@+id/btnPickLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Escolher Localização"
-        android:layout_below="@id/etDate"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp" />
+        <EditText
+            android:id="@+id/etDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/etDescription"
+            android:layout_margin="16dp"
+            android:hint="@string/date_hint" />
 
-    <FrameLayout
-        android:id="@+id/mapContainer"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_below="@id/btnPickLocation"
-        android:layout_marginTop="16dp" />
+        <Spinner
+            android:id="@+id/spinnerRating"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/etDate"
+            android:layout_margin="16dp"
+            android:prompt="@string/rating_prompt" />
 
-    <Spinner
-        android:id="@+id/spinnerRating"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/mapContainer"
-        android:layout_margin="16dp"
-        android:prompt="@string/rating_prompt" />
+        <Button
+            android:id="@+id/btnPickLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Escolher Localização"
+            android:layout_below="@id/spinnerRating"
+            android:layout_marginTop="16dp"
+            android:layout_centerHorizontal="true" />
 
-    <ImageButton
-        android:id="@+id/btnAddPhoto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_add_photo"
-        android:layout_below="@id/spinnerRating"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/add_photo" />
+        <EditText
+            android:id="@+id/etLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnPickLocation"
+            android:layout_margin="16dp"
+            android:hint="Coordenadas"
+            android:editable="false" />
 
-    <Button
-        android:id="@+id/btnSave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/save"
-        android:layout_below="@id/btnAddPhoto"
-        android:layout_margin="16dp" />
-</RelativeLayout>
+        <TextView
+            android:id="@+id/tvAddPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Adicionar foto"
+            android:layout_below="@id/etLocation"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp" />
+
+        <ImageButton
+            android:id="@+id/btnAddPhoto"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_add_photo"
+            android:layout_below="@id/tvAddPhoto"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="8dp"
+            android:contentDescription="@string/add_photo" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:layout_below="@id/btnAddPhoto"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="16dp"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp" />
+    </RelativeLayout>
+</ScrollView>
