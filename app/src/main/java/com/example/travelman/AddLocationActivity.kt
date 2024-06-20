@@ -1,6 +1,7 @@
 package com.example.travelman
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
@@ -13,16 +14,23 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import com.example.travelman.database.AppDatabase
+import com.example.travelman.entity.LocationEntity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    private lateinit var spinnerType: Spinner
     private lateinit var etName: EditText
     private lateinit var etDescription: EditText
     private lateinit var etDate: EditText
@@ -30,11 +38,13 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var btnAddPhoto: ImageButton
     private lateinit var btnPickLocation: Button
     private lateinit var btnSave: Button
-    private lateinit var etLocation: EditText
     private lateinit var googleMap: GoogleMap
     private var selectedLatLng: LatLng? = null
-    private val photos = mutableListOf<String>() // Simulando com strings de caminho de imagem
+    private val photos = mutableListOf<String>()
+    private lateinit var db: AppDatabase
+    private var tripId: Int = -1
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_location)
@@ -42,6 +52,7 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Add Local"
 
+        spinnerType = findViewById(R.id.spinnerType)
         etName = findViewById(R.id.etName)
         etDescription = findViewById(R.id.etDescription)
         etDate = findViewById(R.id.etDate)
@@ -49,24 +60,18 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         btnAddPhoto = findViewById(R.id.btnAddPhoto)
         btnPickLocation = findViewById(R.id.btnPickLocation)
         btnSave = findViewById(R.id.btnSave)
-        etLocation = findViewById(R.id.etLocation)
 
-        // Setup spinner for rating
-        val ratingAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.location_ratings,
-            android.R.layout.simple_spinner_item
-        )
-        ratingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerRating.adapter = ratingAdapter
+        db = AppDatabase.getDatabase(this)
+
+        // Get tripId from intent
+        tripId = intent.getIntExtra("TRIP_ID", -1)
 
         etDate.setOnClickListener {
             showDatePickerDialog()
         }
 
         btnPickLocation.setOnClickListener {
-            val intent = Intent(this, PickLocationActivity::class.java)
-            startActivityForResult(intent, PICK_LOCATION_REQUEST_CODE)
+            showMapFragment()
         }
 
         btnAddPhoto.setOnClickListener {
@@ -74,28 +79,27 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         btnSave.setOnClickListener {
-            val type = "Tipo" // Just a placeholder
+            val type = spinnerType.selectedItem.toString()
             val name = etName.text.toString()
             val description = etDescription.text.toString()
             val date = etDate.text.toString()
-            val rating = spinnerRating.selectedItem?.toString()
+            val rating = spinnerRating.selectedItem.toString().toInt()
 
-            Log.d("AddLocationActivity", "Type: $type, Name: $name, Description: $description, Date: $date, Rating: $rating, Latitude: ${selectedLatLng?.latitude}, Longitude: ${selectedLatLng?.longitude}")
-
-            if (!type.isNullOrEmpty() && name.isNotEmpty() && description.isNotEmpty() && date.isNotEmpty() && !rating.isNullOrEmpty() && selectedLatLng != null) {
-                val intent = Intent()
-                intent.putExtra("TYPE", type)
-                intent.putExtra("NAME", name)
-                intent.putExtra("DESCRIPTION", description)
-                intent.putExtra("DATE", date)
-                intent.putExtra("RATING", rating)
-                intent.putExtra("LATITUDE", selectedLatLng?.latitude)
-                intent.putExtra("LONGITUDE", selectedLatLng?.longitude)
-                intent.putStringArrayListExtra("PHOTOS", ArrayList(photos))
-                setResult(Activity.RESULT_OK, intent)
-                finish()
+            if (selectedLatLng != null && name.isNotEmpty() && description.isNotEmpty() && date.isNotEmpty() && rating > 0) {
+                val location = LocationEntity(
+                    tripId = tripId, // Ensure tripId is properly initialized
+                    name = name,
+                    type = type,
+                    description = description,
+                    visitDate = date,
+                    rating = rating,
+                    latitude = selectedLatLng!!.latitude,
+                    longitude = selectedLatLng!!.longitude,
+                    photos = photos
+                )
+                saveLocation(location)
             } else {
-                Toast.makeText(this, "Por favor, preencha todos os campos e escolha uma localização", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -116,13 +120,22 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         datePickerDialog.show()
     }
 
+    private fun showMapFragment() {
+        val mapFragment = SupportMapFragment.newInstance()
+        mapFragment.getMapAsync(this)
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.mapContainer, mapFragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
     private fun checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
         } else {
-            // Permission has already been granted
             initializeMap()
         }
     }
@@ -139,7 +152,6 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
             ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_PERMISSION_REQUEST_CODE)
         } else {
-            // Permission has already been granted
             pickPhotoFromGallery()
         }
     }
@@ -159,19 +171,15 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         when (requestCode) {
             LOCATION_PERMISSION_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    // Permission was granted, yay!
                     initializeMap()
                 } else {
-                    // Permission denied, boo!
                     Toast.makeText(this, "Permission denied to access location", Toast.LENGTH_SHORT).show()
                 }
             }
             STORAGE_PERMISSION_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    // Permission was granted, yay!
                     pickPhotoFromGallery()
                 } else {
-                    // Permission denied, boo!
                     Toast.makeText(this, "Permission denied to access storage", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -180,21 +188,10 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                PICK_PHOTO_REQUEST_CODE -> {
-                    data?.data?.let { uri ->
-                        // Adicione o URI da foto à lista de fotos
-                        photos.add(uri.toString())
-                        Toast.makeText(this, "Foto adicionada", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                PICK_LOCATION_REQUEST_CODE -> {
-                    val latitude = data?.getDoubleExtra("LATITUDE", 0.0) ?: 0.0
-                    val longitude = data?.getDoubleExtra("LONGITUDE", 0.0) ?: 0.0
-                    selectedLatLng = LatLng(latitude, longitude)
-                    etLocation.setText("Lat: $latitude, Lng: $longitude")
-                }
+        if (resultCode == Activity.RESULT_OK && requestCode == PICK_PHOTO_REQUEST_CODE) {
+            data?.data?.let { uri ->
+                photos.add(uri.toString())
+                Toast.makeText(this, "Foto adicionada", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -223,10 +220,19 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun saveLocation(location: LocationEntity) {
+        CoroutineScope(Dispatchers.IO).launch {
+            db.locationDao().insert(location)
+            runOnUiThread {
+                Toast.makeText(this@AddLocationActivity, "Local salvo com sucesso", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
+    }
+
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
         private const val STORAGE_PERMISSION_REQUEST_CODE = 2
         private const val PICK_PHOTO_REQUEST_CODE = 3
-        private const val PICK_LOCATION_REQUEST_CODE = 4
     }
 }

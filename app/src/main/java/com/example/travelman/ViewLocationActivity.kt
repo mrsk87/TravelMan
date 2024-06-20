@@ -6,7 +6,14 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
+import com.example.travelman.R
+import com.example.travelman.database.AppDatabase
+import com.example.travelman.entity.LocationEntity
+import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ViewLocationActivity : AppCompatActivity() {
 
@@ -18,9 +25,7 @@ class ViewLocationActivity : AppCompatActivity() {
     private lateinit var tvCoordinates: TextView
     private lateinit var btnOpenInMaps: Button
     private lateinit var photosContainer: LinearLayout
-
-    private var latitude: Double = 0.0
-    private var longitude: Double = 0.0
+    private lateinit var db: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,43 +43,50 @@ class ViewLocationActivity : AppCompatActivity() {
         btnOpenInMaps = findViewById(R.id.btnOpenInMaps)
         photosContainer = findViewById(R.id.photosContainer)
 
-        // Receber dados passados da atividade anterior
-        val type = intent.getStringExtra("TYPE") ?: "Tipo"
-        val name = intent.getStringExtra("NAME") ?: "Nome"
-        val location = intent.getStringExtra("LOCATION") ?: "Localização"
-        val description = intent.getStringExtra("DESCRIPTION") ?: "Descrição"
-        val date = intent.getStringExtra("DATE") ?: "Data"
-        val rating = intent.getStringExtra("RATING") ?: "Classificação"
-        val photos = intent.getStringArrayListExtra("PHOTOS") ?: arrayListOf()
-        latitude = intent.getDoubleExtra("LATITUDE", 0.0)
-        longitude = intent.getDoubleExtra("LONGITUDE", 0.0)
+        db = AppDatabase.getDatabase(this)
 
-        // Preencher os campos com os dados recebidos
-        tvType.text = type
-        tvName.text = name
-        tvDescription.text = description
-        tvDate.text = date
-        tvRating.text = rating
-        tvCoordinates.text = "$latitude, $longitude"
-
-        btnOpenInMaps.setOnClickListener {
-            val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude($name)")
-            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-            mapIntent.setPackage("com.google.android.apps.maps")
-            startActivity(mapIntent)
+        val locationId = intent.getIntExtra("LOCATION_ID", -1)
+        if (locationId != -1) {
+            loadLocationData(locationId)
+        } else {
+            Toast.makeText(this, "Erro ao carregar o local", Toast.LENGTH_SHORT).show()
+            finish()
         }
+    }
 
-        // Adicionar fotos ao container
-        photos.forEach { photo ->
-            val imageView = ImageView(this)
-            Glide.with(this).load(photo).into(imageView)
-            imageView.layoutParams = LinearLayout.LayoutParams(
-                200,
-                200
-            ).apply {
-                setMargins(8, 8, 8, 8)
+    private fun loadLocationData(locationId: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val location = db.locationDao().getLocationById(locationId)
+            withContext(Dispatchers.Main) {
+                updateUI(location)
             }
-            photosContainer.addView(imageView)
+        }
+    }
+
+    private fun updateUI(location: LocationEntity?) {
+        if (location != null) {
+            tvType.text = location.type
+            tvName.text = location.name
+            tvDescription.text = location.description
+            tvDate.text = location.visitDate
+            tvRating.text = location.rating.toString()
+            tvCoordinates.text = "Lat: ${location.latitude}, Lng: ${location.longitude}"
+
+            btnOpenInMaps.setOnClickListener {
+                val gmmIntentUri = Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}(${location.name})")
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                mapIntent.setPackage("com.google.android.apps.maps")
+                startActivity(mapIntent)
+            }
+
+            photosContainer.removeAllViews()
+            location.photos.forEach { photoUri ->
+                val imageView = ImageView(this)
+                Picasso.get().load(photoUri).into(imageView)
+                photosContainer.addView(imageView)
+            }
+        } else {
+            Toast.makeText(this, "Local não encontrado", Toast.LENGTH_SHORT).show()
         }
     }
 
