@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,20 +8,57 @@
         android:id="@+id/tvTripName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Viagem"
+        android:text="Nome da Viagem"
         android:textSize="24sp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:fontFamily="cursive" />
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:id="@+id/tvCountry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="País"
+        android:textSize="18sp"
+        android:layout_below="@id/tvTripName"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:id="@+id/tvCity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cidade"
+        android:textSize="18sp"
+        android:layout_below="@id/tvCountry"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:id="@+id/tvVisitDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Data de Visita"
+        android:textSize="18sp"
+        android:layout_below="@id/tvCity"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp" />
+
+    <Button
+        android:id="@+id/btnOpenInMaps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Abrir no Google Maps"
+        android:layout_below="@id/tvVisitDate"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp" />
 
     <ListView
         android:id="@+id/lvLocations"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tvTripName"
-        android:layout_marginTop="20dp"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp" />
+        android:layout_height="0dp"
+        android:layout_below="@id/btnOpenInMaps"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1" />
 
     <ImageButton
         android:id="@+id/btnAddLocation"

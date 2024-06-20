@@ -2,6 +2,7 @@ package com.example.travelman
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -12,10 +13,16 @@ import androidx.appcompat.app.AppCompatActivity
 class TripLocationsActivity : AppCompatActivity() {
 
     private lateinit var tvTripName: TextView
+    private lateinit var tvCountry: TextView
+    private lateinit var tvCity: TextView
+    private lateinit var tvVisitDate: TextView
+    private lateinit var btnOpenInMaps: Button
     private lateinit var lvLocations: ListView
     private lateinit var btnAddLocation: ImageButton
     private val locations = arrayListOf("Local 1", "Local 2", "Local 3")
     private lateinit var tripName: String
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,11 +32,31 @@ class TripLocationsActivity : AppCompatActivity() {
         supportActionBar?.title = "Locais da Viagem"
 
         tvTripName = findViewById(R.id.tvTripName)
+        tvCountry = findViewById(R.id.tvCountry)
+        tvCity = findViewById(R.id.tvCity)
+        tvVisitDate = findViewById(R.id.tvVisitDate)
+        btnOpenInMaps = findViewById(R.id.btnOpenInMaps)
         lvLocations = findViewById(R.id.lvLocations)
         btnAddLocation = findViewById(R.id.btnAddLocation)
 
         tripName = intent.getStringExtra("TRIP_NAME") ?: "Viagem"
+        val country = intent.getStringExtra("COUNTRY") ?: "País"
+        val city = intent.getStringExtra("CITY") ?: "Cidade"
+        val visitDate = intent.getStringExtra("VISIT_DATE") ?: "Data"
+        latitude = intent.getDoubleExtra("LATITUDE", 0.0)
+        longitude = intent.getDoubleExtra("LONGITUDE", 0.0)
+
         tvTripName.text = tripName
+        tvCountry.text = country
+        tvCity.text = city
+        tvVisitDate.text = visitDate
+
+        btnOpenInMaps.setOnClickListener {
+            val gmmIntentUri = Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude($tripName)")
+            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+            mapIntent.setPackage("com.google.android.apps.maps")
+            startActivity(mapIntent)
+        }
 
         val adapter = LocationAdapter()
         lvLocations.adapter = adapter

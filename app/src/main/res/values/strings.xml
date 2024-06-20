@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">TravelMan</string>
+    <string name="type_prompt">Escolha o tipo</string>
+    <string name="name_hint">Nome</string>
+    <string name="description_hint">Descrição</string>
+    <string name="date_hint">Data</string>
+    <string name="rating_prompt">Escolha a classificação</string>
+    <string name="add_photo">Adicionar Foto</string>
+    <string name="save">Salvar</string>
 </resources>

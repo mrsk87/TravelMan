@@ -1,39 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".EditTripActivity">
 
-    <TextView
-        android:id="@+id/tvEditTripTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Editar Viagem"
-        android:textSize="24sp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:fontFamily="cursive" />
-
     <EditText
         android:id="@+id/etEditTripName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nome"
-        android:layout_below="@id/tvEditTripTitle"
-        android:layout_marginTop="30dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp" />
+        android:hint="Nome da Viagem" />
 
     <EditText
         android:id="@+id/etEditCountry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Pais"
+        android:hint="País"
         android:layout_below="@id/etEditTripName"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp" />
+        android:layout_marginTop="8dp" />
 
     <EditText
         android:id="@+id/etEditCity"
@@ -41,30 +24,37 @@
         android:layout_height="wrap_content"
         android:hint="Cidade"
         android:layout_below="@id/etEditCountry"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp" />
+        android:layout_marginTop="8dp" />
 
     <EditText
         android:id="@+id/etEditDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Data"
-        android:layout_below="@id/etEditCity"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
+        android:hint="Data de Visita"
         android:focusable="false"
-        android:clickable="true" />
+        android:layout_below="@id/etEditCity"
+        android:layout_marginTop="8dp" />
+
+    <Button
+        android:id="@+id/btnPickLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Escolher Localização"
+        android:layout_below="@id/etEditDate"
+        android:layout_marginTop="8dp" />
+
+    <FrameLayout
+        android:id="@+id/mapContainer"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/btnPickLocation"
+        android:layout_marginTop="8dp" />
 
     <Button
         android:id="@+id/btnSaveTrip"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Guardar"
-        android:layout_below="@id/etEditDate"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:backgroundTint="@android:color/holo_blue_light"
-        android:textColor="@android:color/white" />
+        android:text="Salvar Viagem"
+        android:layout_below="@id/mapContainer"
+        android:layout_marginTop="16dp" />
 </RelativeLayout>
