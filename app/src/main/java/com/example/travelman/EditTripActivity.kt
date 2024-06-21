@@ -1,43 +1,33 @@
 package com.example.travelman
 
-import android.Manifest
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.example.travelman.database.AppDatabase
+import com.example.travelman.entity.TripEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
-class EditTripActivity : AppCompatActivity(), OnMapReadyCallback {
+class EditTripActivity : AppCompatActivity() {
 
     private lateinit var etEditTripName: EditText
     private lateinit var etEditCountry: EditText
     private lateinit var etEditCity: EditText
     private lateinit var etEditDate: EditText
+    private lateinit var etCoordinates: EditText
     private lateinit var btnPickLocation: Button
     private lateinit var btnSaveTrip: Button
-    private lateinit var googleMap: GoogleMap
-    private var selectedLatLng: LatLng? = null
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-
-    companion object {
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-    }
+    private lateinit var db: AppDatabase
+    private var tripId: Int = -1
+    private var selectedLatLng: Pair<Double, Double>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,43 +37,79 @@ class EditTripActivity : AppCompatActivity(), OnMapReadyCallback {
         etEditCountry = findViewById(R.id.etEditCountry)
         etEditCity = findViewById(R.id.etEditCity)
         etEditDate = findViewById(R.id.etEditDate)
+        etCoordinates = findViewById(R.id.etCoordinates)
         btnPickLocation = findViewById(R.id.btnPickLocation)
         btnSaveTrip = findViewById(R.id.btnSaveTrip)
+        db = AppDatabase.getDatabase(this)
+
+        // Get tripId from intent
+        tripId = intent.getIntExtra("TRIP_ID", -1)
+
+        // Load trip data
+        loadTripData(tripId)
 
         etEditDate.setOnClickListener {
             showDatePickerDialog()
         }
 
         btnPickLocation.setOnClickListener {
-            showMapFragment()
+            val intent = Intent(this, PickLocationActivity::class.java)
+            startActivityForResult(intent, PICK_LOCATION_REQUEST_CODE)
         }
-
-        val tripName = intent.getStringExtra("TRIP_NAME")
-        val position = intent.getIntExtra("POSITION", -1)
-
-        etEditTripName.setText(tripName)
 
         btnSaveTrip.setOnClickListener {
             val newTripName = etEditTripName.text.toString()
             val country = etEditCountry.text.toString()
             val city = etEditCity.text.toString()
             val visitDate = etEditDate.text.toString()
+            val (latitude, longitude) = selectedLatLng ?: Pair(null, null)
 
-            if (newTripName.isNotEmpty() && country.isNotEmpty() && city.isNotEmpty() && visitDate.isNotEmpty() && selectedLatLng != null) {
-                val resultIntent = Intent()
-                resultIntent.putExtra("NEW_TRIP_NAME", newTripName)
-                resultIntent.putExtra("POSITION", position)
-                resultIntent.putExtra("VISIT_DATE", visitDate)
-                resultIntent.putExtra("LATITUDE", selectedLatLng!!.latitude)
-                resultIntent.putExtra("LONGITUDE", selectedLatLng!!.longitude)
-                setResult(Activity.RESULT_OK, resultIntent)
-                finish()
+            if (newTripName.isNotEmpty() && country.isNotEmpty() && city.isNotEmpty() && visitDate.isNotEmpty() && latitude != null && longitude != null) {
+                val updatedTrip = TripEntity(
+                    id = tripId,
+                    name = newTripName,
+                    country = country,
+                    city = city,
+                    visitDate = visitDate,
+                    latitude = latitude,
+                    longitude = longitude
+                )
+                updateTrip(updatedTrip)
             } else {
                 Toast.makeText(this, "Por favor, preencha todos os campos e escolha uma localização", Toast.LENGTH_SHORT).show()
             }
         }
+    }
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+    private fun loadTripData(tripId: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val trip = db.tripDao().getTripById(tripId)
+            withContext(Dispatchers.Main) {
+                trip?.let {
+                    etEditTripName.setText(it.name)
+                    etEditCountry.setText(it.country)
+                    etEditCity.setText(it.city)
+                    etEditDate.setText(it.visitDate)
+                    it.latitude?.let { lat ->
+                        it.longitude?.let { lng ->
+                            selectedLatLng = Pair(lat, lng)
+                            etCoordinates.setText("$lat, $lng")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateTrip(trip: TripEntity) {
+        CoroutineScope(Dispatchers.IO).launch {
+            db.tripDao().update(trip)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@EditTripActivity, "Viagem atualizada com sucesso", Toast.LENGTH_SHORT).show()
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
+        }
     }
 
     private fun showDatePickerDialog() {
@@ -100,56 +126,19 @@ class EditTripActivity : AppCompatActivity(), OnMapReadyCallback {
         datePickerDialog.show()
     }
 
-    private fun showMapFragment() {
-        val mapFragment = SupportMapFragment.newInstance()
-        mapFragment.getMapAsync(this)
-
-        supportFragmentManager.beginTransaction()
-            .add(R.id.mapContainer, mapFragment)
-            .addToBackStack(null)
-            .commit()
-    }
-
-    override fun onMapReady(map: GoogleMap) {
-        googleMap = map
-        googleMap.setOnMapClickListener { latLng ->
-            googleMap.clear()
-            googleMap.addMarker(MarkerOptions().position(latLng).title("Localização Selecionada"))
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-            selectedLatLng = latLng
-        }
-
-        // Verificar permissão de localização
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap.isMyLocationEnabled = true
-            moveToCurrentLocation()
-        } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
-        }
-    }
-
-    private fun moveToCurrentLocation() {
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            location?.let {
-                val currentLatLng = LatLng(it.latitude, it.longitude)
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
-                googleMap.addMarker(MarkerOptions().position(currentLatLng).title("Você está aqui"))
-                selectedLatLng = currentLatLng
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == PICK_LOCATION_REQUEST_CODE) {
+            data?.let {
+                val latitude = it.getDoubleExtra("LATITUDE", 0.0)
+                val longitude = it.getDoubleExtra("LONGITUDE", 0.0)
+                selectedLatLng = Pair(latitude, longitude)
+                etCoordinates.setText("$latitude, $longitude")
             }
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    googleMap.isMyLocationEnabled = true
-                    moveToCurrentLocation()
-                }
-            } else {
-                Toast.makeText(this, "Permissão de localização negada", Toast.LENGTH_SHORT).show()
-            }
-        }
+    companion object {
+        private const val PICK_LOCATION_REQUEST_CODE = 1
     }
 }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.travelman.entity.TripEntity
 
 @Dao
@@ -19,4 +20,7 @@ interface TripDao {
 
     @Delete
     suspend fun delete(trip: TripEntity)
+
+    @Update
+    suspend fun update(trip: TripEntity)
 }
