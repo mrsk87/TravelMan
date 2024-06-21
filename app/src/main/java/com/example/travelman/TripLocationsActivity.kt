@@ -14,7 +14,6 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.travelman.AddLocationActivity
 import com.example.travelman.database.AppDatabase
 import com.example.travelman.entity.LocationEntity
 import com.example.travelman.entity.TripEntity
@@ -35,6 +34,7 @@ class TripLocationsActivity : AppCompatActivity() {
     private val locations = arrayListOf<LocationEntity>()
     private lateinit var trip: TripEntity
     private lateinit var db: AppDatabase
+    private lateinit var adapter: LocationAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +52,8 @@ class TripLocationsActivity : AppCompatActivity() {
         btnAddLocation = findViewById(R.id.btnAddLocation)
 
         db = AppDatabase.getDatabase(this)
+        adapter = LocationAdapter()
+        lvLocations.adapter = adapter
 
         val tripId = intent.getIntExtra("TRIP_ID", -1)
         if (tripId != -1) {
@@ -68,6 +70,13 @@ class TripLocationsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::trip.isInitialized) {
+            loadTripData(trip.id)
+        }
+    }
+
     private fun loadTripData(tripId: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             trip = db.tripDao().getTripById(tripId)!!
@@ -80,38 +89,31 @@ class TripLocationsActivity : AppCompatActivity() {
     }
 
     private fun updateUI() {
-        tvTripName.text = trip.name
-        tvCountry.text = trip.country
-        tvCity.text = trip.city
-        tvVisitDate.text = trip.visitDate
+        tvTripName.text = "Nome: ${trip.name}"
+        tvCountry.text = "País: ${trip.country}"
+        tvCity.text = "Cidade: ${trip.city}"
+        tvVisitDate.text = "Data de Visita: ${trip.visitDate}"
 
         btnOpenInMaps.setOnClickListener {
-            val gmmIntentUri = Uri.parse("geo:${locations[0].latitude},${locations[0].longitude}?q=${locations[0].latitude},${locations[0].longitude}(${locations[0].name})")
+            val gmmIntentUri = Uri.parse("geo:${trip.latitude},${trip.longitude}?q=${trip.latitude},${trip.longitude}(${trip.name})")
             val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
             mapIntent.setPackage("com.google.android.apps.maps")
-            startActivity(mapIntent)
+            if (mapIntent.resolveActivity(packageManager) != null) {
+                startActivity(mapIntent)
+            } else {
+                Toast.makeText(this, "Google Maps app is not installed.", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        val adapter = LocationAdapter()
-        lvLocations.adapter = adapter
+        adapter.notifyDataSetChanged()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                ADD_LOCATION_REQUEST_CODE -> {
-                    val locationName = data?.getStringExtra("NAME")
-                    if (!locationName.isNullOrEmpty()) {
-                        loadTripData(trip.id)
-                    }
-                }
-                EDIT_LOCATION_REQUEST_CODE -> {
-                    val locationName = data?.getStringExtra("NAME")
-                    val position = data?.getIntExtra("POSITION", -1)
-                    if (!locationName.isNullOrEmpty() && position != null && position >= 0) {
-                        loadTripData(trip.id)
-                    }
+                ADD_LOCATION_REQUEST_CODE, EDIT_LOCATION_REQUEST_CODE -> {
+                    loadTripData(trip.id)  // Reload trip data to update locations list
                 }
             }
         }
@@ -146,12 +148,13 @@ class TripLocationsActivity : AppCompatActivity() {
 
             btnDelete.setOnClickListener {
                 if (position in locations.indices) {
+                    val location = locations[position]
                     CoroutineScope(Dispatchers.IO).launch {
-                        db.locationDao().delete(locations[position])
+                        db.locationDao().delete(location)
                         withContext(Dispatchers.Main) {
                             locations.removeAt(position)
                             notifyDataSetChanged()
-                            Toast.makeText(this@TripLocationsActivity, "Apagar ${getItem(position)?.name}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@TripLocationsActivity, "Apagado ${location.name}", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

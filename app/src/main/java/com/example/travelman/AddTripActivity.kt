@@ -93,6 +93,7 @@ class AddTripActivity : AppCompatActivity() {
             db.tripDao().insert(trip)
             withContext(Dispatchers.Main) {
                 Toast.makeText(this@AddTripActivity, "Viagem salva com sucesso", Toast.LENGTH_SHORT).show()
+                setResult(Activity.RESULT_OK) // Notify TripDetailActivity to refresh
                 finish()
             }
         }

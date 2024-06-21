@@ -171,7 +171,15 @@ class AddLocationActivity : AppCompatActivity(), OnMapReadyCallback {
         val name = etName.text?.toString() ?: ""
         val description = etDescription.text?.toString() ?: ""
         val date = etVisitDate.text?.toString() ?: ""
-        val rating = spinnerRating.selectedItem?.toString()?.toIntOrNull() ?: 0
+        val ratingStr = spinnerRating.selectedItem?.toString() ?: ""
+        val rating = when (ratingStr) {
+            "1 Estrela" -> 1
+            "2 Estrelas" -> 2
+            "3 Estrelas" -> 3
+            "4 Estrelas" -> 4
+            "5 Estrelas" -> 5
+            else -> 0
+        }
 
         val latitude = selectedLatLng?.latitude
         val longitude = selectedLatLng?.longitude
