@@ -80,7 +80,7 @@ class ViewLocationActivity : AppCompatActivity() {
             }
 
             photosContainer.removeAllViews()
-            location.photos.forEach { photoUri ->
+            location.photos?.forEach { photoUri ->
                 val imageView = ImageView(this)
                 Picasso.get().load(photoUri).into(imageView)
                 photosContainer.addView(imageView)

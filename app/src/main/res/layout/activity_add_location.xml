@@ -5,72 +5,110 @@
     android:layout_height="match_parent"
     tools:context=".AddLocationActivity">
 
-    <Spinner
-        android:id="@+id/spinnerType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp" />
+
 
     <EditText
         android:id="@+id/etName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Name"
         android:layout_below="@id/spinnerType"
-        android:layout_margin="16dp" />
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Name" />
 
     <EditText
         android:id="@+id/etDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Description"
         android:layout_below="@id/etName"
-        android:layout_margin="16dp" />
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Description" />
 
     <EditText
-        android:id="@+id/etDate"
+        android:id="@+id/etVisitDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Date"
         android:layout_below="@id/etDescription"
-        android:layout_margin="16dp" />
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Date" />
+
+    <TextView
+        android:id="@+id/tvRatingLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etVisitDate"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:text="Classificação:" />
 
     <Spinner
         android:id="@+id/spinnerRating"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/etDate"
-        android:layout_margin="16dp" />
+        android:layout_below="@id/tvRatingLabel"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
 
-    <ImageButton
-        android:id="@+id/btnAddPhoto"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/tvCoordinates"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_camera"
-        android:contentDescription="Add Photo"
         android:layout_below="@id/spinnerRating"
-        android:layout_margin="16dp" />
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Coordinates" />
 
     <Button
         android:id="@+id/btnPickLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pick Location"
-        android:layout_below="@id/btnAddPhoto"
-        android:layout_margin="16dp" />
+        android:layout_below="@id/tvCoordinates"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:text="Pick Location" />
 
-    <FrameLayout
-        android:id="@+id/mapContainer"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
+    <ImageButton
+        android:id="@+id/btnAddPhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/btnPickLocation"
-        android:layout_margin="16dp" />
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:src="@android:drawable/ic_menu_camera"
+        android:contentDescription="Add Photo" />
+
+    <LinearLayout
+        android:id="@+id/photoContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnAddPhoto"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
 
     <Button
         android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save"
-        android:layout_below="@id/mapContainer"
-        android:layout_margin="16dp" />
+        android:layout_below="@id/photoContainer"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:text="Save" />
+
+    <FrameLayout
+        android:id="@+id/mapContainer"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/btnSave"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
 </RelativeLayout>

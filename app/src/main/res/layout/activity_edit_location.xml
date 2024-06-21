@@ -1,84 +1,99 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".EditLocationActivity">
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Editar Local"
-        android:textSize="24sp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:fontFamily="cursive" />
-
     <Spinner
         android:id="@+id/spinnerType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvTitle"
-        android:layout_marginTop="20dp"
-        android:entries="@array/location_types" />
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
 
     <EditText
         android:id="@+id/etName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/spinnerType"
-        android:layout_marginTop="10dp"
-        android:hint="Nome" />
-
-    <EditText
-        android:id="@+id/etLocation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/etName"
-        android:layout_marginTop="10dp"
-        android:hint="Localização" />
-
-    <EditText
-        android:id="@+id/etDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/etLocation"
-        android:layout_marginTop="10dp"
-        android:hint="Descrição" />
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Name" />
 
     <EditText
         android:id="@+id/etDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/etDescription"
-        android:layout_marginTop="10dp"
-        android:hint="Data" />
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Date" />
+
+    <TextView
+        android:id="@+id/tvRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etDate"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:text="Classificação:" />
 
     <Spinner
         android:id="@+id/spinnerRating"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/etDate"
-        android:layout_marginTop="10dp"
-        android:entries="@array/location_ratings" />
+        android:layout_below="@id/tvRating"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
+
+    <EditText
+        android:id="@+id/etLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/spinnerRating"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Location" />
+
+    <Button
+        android:id="@+id/btnPickLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etLocation"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:text="Pick Location" />
+
+    <TextView
+        android:id="@+id/tvPhotos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnPickLocation"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:text="Photos" />
 
     <ImageButton
         android:id="@+id/btnAddPhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/tvPhotos"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
         android:src="@android:drawable/ic_menu_camera"
-        android:layout_below="@id/spinnerRating"
-        android:layout_marginTop="10dp"
-        android:layout_centerHorizontal="true"
-        android:contentDescription="Foto" />
+        android:contentDescription="Add Photo" />
 
     <Button
         android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Guardar"
         android:layout_below="@id/btnAddPhoto"
-        android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true" />
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:text="Save" />
 </RelativeLayout>

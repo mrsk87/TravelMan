@@ -11,11 +11,11 @@ data class LocationEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val tripId: Int,
     val name: String,
-    val type: String, // Add this line
-    val description: String,
-    val visitDate: String,
-    val rating: Int,
-    val latitude: Double,
-    val longitude: Double,
-    val photos: List<String>
+    val type: String?,
+    val description: String?,
+    val visitDate: String?,
+    val rating: Int?,
+    val latitude: Double?,
+    val longitude: Double?,
+    val photos: List<String>? = emptyList() // Use uma lista vazia como padrão
 )
