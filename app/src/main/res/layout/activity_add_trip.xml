@@ -1,60 +1,53 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddTripActivity">
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <EditText
         android:id="@+id/etTripName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nome da Viagem" />
+        android:hint="Trip Name"/>
 
     <EditText
         android:id="@+id/etCountry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="País"
-        android:layout_below="@id/etTripName"
-        android:layout_marginTop="8dp" />
+        android:hint="Country"/>
 
     <EditText
         android:id="@+id/etCity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Cidade"
-        android:layout_below="@id/etCountry"
-        android:layout_marginTop="8dp" />
+        android:hint="City"/>
 
     <EditText
         android:id="@+id/etVisitDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Data de Visita"
+        android:hint="Visit Date"
         android:focusable="false"
-        android:layout_below="@id/etCity"
-        android:layout_marginTop="8dp" />
+        android:clickable="true"/>
+
+    <EditText
+        android:id="@+id/etCoordinates"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Coordinates"
+        android:focusable="false"
+        android:clickable="true"/>
 
     <Button
         android:id="@+id/btnPickLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Escolher Localização"
-        android:layout_below="@id/etVisitDate"
-        android:layout_marginTop="8dp" />
-
-    <FrameLayout
-        android:id="@+id/mapContainer"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_below="@id/btnPickLocation"
-        android:layout_marginTop="8dp" />
+        android:text="Pick Location"/>
 
     <Button
         android:id="@+id/btnAddTrip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Adicionar Viagem"
-        android:layout_below="@id/mapContainer"
-        android:layout_marginTop="16dp" />
-</RelativeLayout>
+        android:text="Add Trip"/>
+</LinearLayout>

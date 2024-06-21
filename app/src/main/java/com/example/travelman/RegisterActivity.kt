@@ -1,13 +1,13 @@
 package com.example.travelman
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -17,7 +17,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var etPassword: EditText
     private lateinit var btnRegister: Button
     private lateinit var auth: FirebaseAuth
-    private lateinit var database: DatabaseReference
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +30,7 @@ class RegisterActivity : AppCompatActivity() {
         btnRegister = findViewById(R.id.btnRegister)
 
         auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance().getReference("Users")
+        db = FirebaseFirestore.getInstance()
 
         btnRegister.setOnClickListener {
             val username = etUsername.text.toString()
@@ -60,10 +60,12 @@ class RegisterActivity : AppCompatActivity() {
                     )
 
                     if (userId != null) {
-                        database.child(userId).setValue(userMap).addOnCompleteListener { dbTask ->
+                        db.collection("Users").document(userId).set(userMap).addOnCompleteListener { dbTask ->
                             if (dbTask.isSuccessful) {
                                 Toast.makeText(this, "Registrado com sucesso", Toast.LENGTH_SHORT).show()
-                                finish() // Voltar para a tela de login ou principal
+                                val intent = Intent(this, TripDetailActivity::class.java)
+                                startActivity(intent)
+                                finish()
                             } else {
                                 Toast.makeText(this, "Falha ao salvar dados do usuário", Toast.LENGTH_SHORT).show()
                             }

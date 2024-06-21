@@ -9,5 +9,7 @@ data class TripEntity(
     val name: String,
     val country: String,
     val city: String,
-    val visitDate: String
+    val visitDate: String,
+    val latitude: Double?,
+    val longitude: Double?
 )

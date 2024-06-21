@@ -1,6 +1,7 @@
 package com.example.travelman.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.travelman.entity.TripEntity
@@ -15,4 +16,7 @@ interface TripDao {
 
     @Query("SELECT * FROM trips")
     suspend fun getAllTrips(): List<TripEntity>
+
+    @Delete
+    suspend fun delete(trip: TripEntity)
 }
